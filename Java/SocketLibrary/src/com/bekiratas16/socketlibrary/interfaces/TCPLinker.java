@@ -9,15 +9,12 @@ package com.bekiratas16.socketlibrary.interfaces;
  *
  * @author ACER
  */
-public interface TCPLinker<T> {
+public interface TCPLinker {
 
     public void connect();
 
     public void disconnect();
-  
-    public void sendMessage(T message);
-    
-    
-    
+
+    public void sendMessage(String message);
 
 }

@@ -11,8 +11,8 @@ package com.bekiratas16.socketlibrary.interfaces;
  */
 public interface TCPConnectionStateListener {
 
-    public abstract void onConnect();
+    public void onConnect();
 
-    public abstract void onDisconnect();
+    public void onDisconnect();
 
 }

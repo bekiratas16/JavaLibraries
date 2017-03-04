@@ -15,26 +15,43 @@ import com.bekiratas16.socketlibrary.interfaces.TCPLinker;
  * @author ACER
  * @param <T>
  */
-public abstract class TCPClient<T> implements TCPLinker<T>, MessageListener<T>, TCPConnectionStateListener {
+public abstract class TCPClient implements TCPLinker, MessageListener, TCPConnectionStateListener {
 
-    private static final String DEFAULT_IP_ADRESS = "127.0.0.1";
+    private static final String DEFAULT_HOST = "127.0.0.1";
     private static final int DEFAULT_PORT = 80;
     private static final int DEFAULT_TIMEOUT = 10000;
 
-    private String IPAdress;
+    private String host;
     private int port;
     private Socket socket;
     private int timeout;
+    private boolean connected;
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
 //    private TCPConnectionStateListener connectionStateListener;
 //    private MessageListener messageListener;
 
     public TCPClient() {
-        this(DEFAULT_IP_ADRESS, DEFAULT_PORT, DEFAULT_TIMEOUT);
+        this(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT);
 
     }
 
-    public TCPClient(String IPAdress, int port, int timeout) {
-        this.IPAdress = IPAdress;
+    public TCPClient(String host, int port, int timeout) {
+
+        if (host == null || host.equals("") || port <= 0) {
+            this.host = DEFAULT_HOST;
+            this.port = DEFAULT_PORT;
+            this.timeout = DEFAULT_TIMEOUT;
+            return;
+        }
+
+        this.host = host;
         this.port = port;
         this.timeout = timeout;
     }
@@ -48,11 +65,11 @@ public abstract class TCPClient<T> implements TCPLinker<T>, MessageListener<T>, 
     }
 
     public String getIPAdress() {
-        return IPAdress;
+        return host;
     }
 
     public void setIPAdress(String IPAdress) {
-        this.IPAdress = IPAdress;
+        this.host = IPAdress;
     }
 
     public int getPort() {
@@ -70,29 +87,29 @@ public abstract class TCPClient<T> implements TCPLinker<T>, MessageListener<T>, 
     public void setSocket(Socket socket) {
         this.socket = socket;
     }
-    private ListenToServer<T> listenFromServer;
+    private ListenToServer listenFromServer;
 
     @Override
-    public void sendMessage(T message) {
+    public synchronized void sendMessage(String message) {
         listenFromServer.sendMessage(message);
     }
 
     @Override
-    public void disconnect() {
+    public synchronized void disconnect() {
         listenFromServer.stopListener();
     }
 
     @Override
-    public void connect() {
+    public synchronized void connect() {
         listenFromServer = new ListenToServer(this);
         listenFromServer.startListener();
     }
 
     @Override
-    public abstract void onSuccessMessage(T message);
+    public abstract void onSuccessMessage(String message);
 
     @Override
-    public abstract void onFailMessage(T message);
+    public abstract void onFailMessage(String message);
 
     @Override
     public abstract void onConnect();

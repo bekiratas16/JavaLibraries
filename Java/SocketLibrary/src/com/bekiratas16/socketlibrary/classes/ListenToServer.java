@@ -7,9 +7,7 @@ package com.bekiratas16.socketlibrary.classes;
 
 import com.bekiratas16.socketlibrary.interfaces.MessageListener;
 import com.bekiratas16.socketlibrary.interfaces.TCPConnectionStateListener;
-import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.io.BufferedInputStream;
@@ -22,41 +20,32 @@ import com.bekiratas16.socketlibrary.interfaces.TCPLinker;
  *
  * @author ACER
  */
-public class ListenToServer<T> extends Thread implements TCPLinker<T>, MessageListener<T>, TCPConnectionStateListener {
+public class ListenToServer extends Thread implements TCPLinker, MessageListener, TCPConnectionStateListener {
 
-    private boolean connected;
     public static final String END_OF_LINE = "\r\n";
-
-    public boolean isConnected() {
-        return connected;
-    }
-
-    public void setConnected(boolean connected) {
-        this.connected = connected;
-    }
     private BufferedInputStream bufferedInputStream;
     private PrintWriter printWriter;
     private final TCPClient client;
-    private final Gson gson;
     private String readingText;
 
     public ListenToServer(TCPClient client) {
         this.client = client;
-        gson = new Gson();
-        
-  
-
     }
 
     @Override
     public void run() {
 
         connect();
-        if (!isConnected()) {
+        if (!client.isConnected()) {
             return;
         }
 
-        readMessage();
+        while (client.isConnected()) {
+            readMessage();
+        }
+
+        disconnect();
+        onDisconnect();
 
     }
 
@@ -66,88 +55,100 @@ public class ListenToServer<T> extends Thread implements TCPLinker<T>, MessageLi
     }
 
     public void stopListener() {
-        setConnected(false);
+        disconnect();
+        client.setConnected(false);
     }
 
     public void readMessage() {
         try {
 
-            int i = bufferedInputStream.read();
-            if (i == -1) {
+            int readedByte = bufferedInputStream.read();
+            if (readedByte == -1) {
+                onFailMessage("Server closed client connection.");
+                client.setConnected(false);
                 return;
             }
-            readingText = readingText + "" + (char) i;
-            int j = bufferedInputStream.available();
-            if (j > 0) {
-                byte[] arrayOfByte = new byte[j];
+            readingText = "";
+            readingText = Character.toString((char) readedByte);
+            int readableBytes = bufferedInputStream.available();
+            if (readableBytes > 0) {
+                byte[] arrayOfByte = new byte[readableBytes];
                 bufferedInputStream.read(arrayOfByte);
-                readingText = readingText + new String(arrayOfByte);
+                readingText += new String(arrayOfByte);
+                onSuccessMessage(readingText);
             }
 
         } catch (IOException e) {
             readingText = null;
-            disconnect();
-
+            onFailMessage("Client closed connection");
+            client.setConnected(false);
         }
 
     }
 
     @Override
-    public void sendMessage(T message) {
+    public synchronized void sendMessage(String message) {
 
         try {
-            if (printWriter != null) {
-                String str = gson.toJson(message) + END_OF_LINE;
-                printWriter.print(str);
-                printWriter.flush();
+            if (printWriter == null) {
+                return;
             }
+            String str = message + END_OF_LINE;
+            printWriter.print(str);
+            printWriter.flush();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
-    public void onSuccessMessage(T message) {
+    public void onSuccessMessage(String message) {
         client.onSuccessMessage(message);
 
     }
 
     @Override
-    public void onFailMessage(T message) {
+    public void onFailMessage(String message) {
         client.onFailMessage(message);
     }
 
     @Override
-    public void disconnect() {
+    public synchronized void disconnect() {
         try {
             if (client.getSocket() != null) {
                 client.getSocket().close();
+                client.setSocket(null);
+
             }
             if (bufferedInputStream != null) {
                 bufferedInputStream.close();
+                bufferedInputStream = null;
+
             }
             if (printWriter != null) {
                 printWriter.close();
+                printWriter = null;
             }
 
         } catch (Exception e) {
 
             e.printStackTrace();
         }
-        setConnected(false);
-        onDisconnect();
+        client.setConnected(false);
 
     }
 
     @Override
-    public void connect() {
+    public synchronized void connect() {
         try {
             client.setSocket(new Socket());
             client.getSocket().connect(
                     new InetSocketAddress(client.getIPAdress(), client.getPort()), client.getTimeout());
             bufferedInputStream = new BufferedInputStream(client.getSocket().getInputStream());
             printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getSocket().getOutputStream())), true);
-            setConnected(true);
+            client.setConnected(true);
             onConnect();
         } catch (IOException e) {
             disconnect();

@@ -9,10 +9,10 @@ package com.bekiratas16.socketlibrary.interfaces;
  *
  * @author ACER
  */
-public interface MessageListener<T> {
+public interface MessageListener {
 
-    public abstract void onSuccessMessage(T message);
+    public void onSuccessMessage(String message);
 
-    public abstract void onFailMessage(T message);
+    public void onFailMessage(String message);
 
 }
