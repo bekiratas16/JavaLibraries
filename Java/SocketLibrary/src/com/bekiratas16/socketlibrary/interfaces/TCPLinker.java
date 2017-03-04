@@ -3,19 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package socketlibrary;
+package com.bekiratas16.socketlibrary.interfaces;
 
 /**
  *
  * @author ACER
  */
-public class SocketLibrary {
+public interface TCPLinker<T> {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+    public void connect();
+
+    public void disconnect();
+  
+    public void sendMessage(T message);
     
+    
+    
+
 }
