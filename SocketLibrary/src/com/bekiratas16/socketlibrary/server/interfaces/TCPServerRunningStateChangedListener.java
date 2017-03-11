@@ -3,18 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bekiratas16.socketlibrary.interfaces;
+package com.bekiratas16.socketlibrary.server.interfaces;
 
 /**
  *
  * @author ACER
  */
-public interface TCPLinker {
-
-    public void connect();
-
-    public void disconnect();
-
-    public void sendMessage(String message);
-
+public interface TCPServerRunningStateChangedListener {
+    
+  public void onServerStarted();
+  public void onServerStopped();
+            
+    
 }

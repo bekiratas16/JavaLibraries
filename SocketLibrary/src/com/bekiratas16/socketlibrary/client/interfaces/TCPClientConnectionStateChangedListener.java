@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bekiratas16.socketlibrary.interfaces;
+package com.bekiratas16.socketlibrary.client.interfaces;
 
 /**
  *
  * @author ACER
  */
-public interface TCPConnectionStateListener {
+public interface TCPClientConnectionStateChangedListener {
 
-    public void onConnect();
+    public void onConnected();
 
-    public void onDisconnect();
+    public void onDisconnected();
 
 }

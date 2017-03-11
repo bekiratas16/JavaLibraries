@@ -3,25 +3,37 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bekiratas16.socketlibrary.demo;
+package com.bekiratas16.socketlibrary.client.demo;
 
-import com.bekiratas16.socketlibrary.classes.TCPClient;
+import com.bekiratas16.socketlibrary.client.classes.TCPClient;
+import java.awt.event.KeyEvent;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 /**
  *
  * @author ACER
  */
-public class FrmDemo extends javax.swing.JFrame {
+public class FrmClient extends javax.swing.JFrame {
 
     /**
-     * Creates new form FrmDemo
+     * Creates new form FrmClient
      */
     TCPClient client;
+    private static final String TEXT_SUBMIT = "text-submit";
+    private static final String INSERT_BREAK = "insert-break";
 
-    public FrmDemo() {
-        super("Socket Demo Ver 1.0");
+    public FrmClient() {
+        super("Socket Client Demo Ver 1.0");
         initComponents();
+
+        InputMap input = taMessage.getInputMap();
+        KeyStroke enter = KeyStroke.getKeyStroke("ENTER");
+        KeyStroke shiftEnter = KeyStroke.getKeyStroke("shift ENTER");
+        input.put(shiftEnter, INSERT_BREAK);  // input.get(enter)) = "insert-break"
+        input.put(enter, TEXT_SUBMIT);
+
         btnSend.setEnabled(false);
         btnConnect.setEnabled(true);
         txtHost.setText("127.0.0.1");
@@ -33,9 +45,9 @@ public class FrmDemo extends javax.swing.JFrame {
         if (client == null || !client.isConnected()) {
             return;
         }
-        client.sendMessage(txtMessage.getText());
-        taMessageLog.append("Source :" + txtMessage.getText() + "\r\n");
-        txtMessage.setText("");
+        client.sendMessage(taMessage.getText());
+        taMessageLog.append("Source :" + taMessage.getText() + "\r\n");
+        taMessage.setText("");
     }
 
     /**
@@ -49,7 +61,6 @@ public class FrmDemo extends javax.swing.JFrame {
 
         spMessageLog = new javax.swing.JScrollPane();
         taMessageLog = new javax.swing.JTextArea();
-        txtMessage = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
         btnConnect = new javax.swing.JButton();
         txtHost = new javax.swing.JTextField();
@@ -57,18 +68,14 @@ public class FrmDemo extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         txtPort = new javax.swing.JTextField();
         btnClear = new javax.swing.JButton();
+        spMessage = new javax.swing.JScrollPane();
+        taMessage = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         taMessageLog.setColumns(20);
         taMessageLog.setRows(5);
         spMessageLog.setViewportView(taMessageLog);
-
-        txtMessage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMessageActionPerformed(evt);
-            }
-        });
 
         btnSend.setText("Send");
         btnSend.addActionListener(new java.awt.event.ActionListener() {
@@ -95,6 +102,15 @@ public class FrmDemo extends javax.swing.JFrame {
             }
         });
 
+        taMessage.setColumns(20);
+        taMessage.setRows(5);
+        taMessage.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                taMessageKeyPressed(evt);
+            }
+        });
+        spMessage.setViewportView(taMessage);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,7 +122,7 @@ public class FrmDemo extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
-                        .addComponent(txtHost, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+                        .addComponent(txtHost, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
@@ -116,9 +132,9 @@ public class FrmDemo extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtMessage)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(spMessage)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -133,11 +149,11 @@ public class FrmDemo extends javax.swing.JFrame {
                     .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnClear))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(spMessageLog, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSend))
+                .addComponent(spMessageLog, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(spMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(btnSend, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -146,11 +162,9 @@ public class FrmDemo extends javax.swing.JFrame {
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
         sendMessage();
-    }//GEN-LAST:event_btnSendActionPerformed
 
-    private void txtMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMessageActionPerformed
-        sendMessage();
-    }//GEN-LAST:event_txtMessageActionPerformed
+
+    }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
 
@@ -167,6 +181,7 @@ public class FrmDemo extends javax.swing.JFrame {
             port = Integer.parseInt(txtPort.getText());
         } catch (Exception e) {
             e.printStackTrace();
+            return;
         }
 
         client = new TCPClient(host, port, 10000) {
@@ -176,7 +191,7 @@ public class FrmDemo extends javax.swing.JFrame {
                     @Override
                     public void run() {
                         taMessageLog.append("Destination :" + message.trim() + "\r\n");
-                        
+
                     }
                 });
 
@@ -196,7 +211,7 @@ public class FrmDemo extends javax.swing.JFrame {
             }
 
             @Override
-            public void onConnect() {
+            public void onConnected() {
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -211,7 +226,7 @@ public class FrmDemo extends javax.swing.JFrame {
             }
 
             @Override
-            public void onDisconnect() {
+            public void onDisconnected() {
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -235,6 +250,15 @@ public class FrmDemo extends javax.swing.JFrame {
         taMessageLog.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
+    private void taMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_taMessageKeyPressed
+
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && !evt.isShiftDown()) {
+            sendMessage();
+
+        }
+
+    }//GEN-LAST:event_taMessageKeyPressed
+
     /**
      * @param args the command line arguments
      */
@@ -252,20 +276,21 @@ public class FrmDemo extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrmDemo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FrmClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrmDemo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FrmClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrmDemo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FrmClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrmDemo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FrmClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FrmDemo().setVisible(true);
+                new FrmClient().setVisible(true);
             }
         });
     }
@@ -276,10 +301,11 @@ public class FrmDemo extends javax.swing.JFrame {
     private javax.swing.JButton btnSend;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane spMessage;
     private javax.swing.JScrollPane spMessageLog;
+    private javax.swing.JTextArea taMessage;
     private javax.swing.JTextArea taMessageLog;
     private javax.swing.JTextField txtHost;
-    private javax.swing.JTextField txtMessage;
     private javax.swing.JTextField txtPort;
     // End of variables declaration//GEN-END:variables
 }

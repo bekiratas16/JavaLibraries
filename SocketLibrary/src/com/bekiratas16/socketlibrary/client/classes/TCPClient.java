@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bekiratas16.socketlibrary.classes;
+package com.bekiratas16.socketlibrary.client.classes;
 
-import com.bekiratas16.socketlibrary.interfaces.MessageListener;
-import com.bekiratas16.socketlibrary.interfaces.TCPConnectionStateListener;
 import java.net.Socket;
-import com.bekiratas16.socketlibrary.interfaces.TCPLinker;
+import com.bekiratas16.socketlibrary.client.interfaces.TCPClientConnectionStateChangedListener;
+import com.bekiratas16.socketlibrary.client.interfaces.TCPClientLinker;
+import com.bekiratas16.socketlibrary.client.interfaces.ClientMessageListener;
 
 /**
  *
  * @author ACER
  * @param <T>
  */
-public abstract class TCPClient implements TCPLinker, MessageListener, TCPConnectionStateListener {
+public abstract class TCPClient implements TCPClientLinker, ClientMessageListener, TCPClientConnectionStateChangedListener {
 
     private static final String DEFAULT_HOST = "127.0.0.1";
     private static final int DEFAULT_PORT = 80;
@@ -35,10 +35,15 @@ public abstract class TCPClient implements TCPLinker, MessageListener, TCPConnec
         this.connected = connected;
     }
 //    private TCPConnectionStateListener connectionStateListener;
-//    private MessageListener messageListener;
+//    private ClientMessageListener messageListener;
 
     public TCPClient() {
         this(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT);
+
+    }
+
+    public TCPClient(String host, int port) {
+        this(host, port, DEFAULT_TIMEOUT);
 
     }
 
@@ -104,49 +109,4 @@ public abstract class TCPClient implements TCPLinker, MessageListener, TCPConnec
         listenFromServer = new ListenToServer(this);
         listenFromServer.startListener();
     }
-
-    @Override
-    public abstract void onSuccessMessage(String message);
-
-    @Override
-    public abstract void onFailMessage(String message);
-
-    @Override
-    public abstract void onConnect();
-
-    @Override
-    public abstract void onDisconnect();
-
-//    @Override
-//    public void onSuccessMessage(T message) {
-//        if (messageListener == null) {
-//            return;
-//        }
-//        messageListener.onSuccessMessage(message);
-//    }
-//
-//    @Override
-//    public void onFailMessage(T message) {
-//        if (messageListener == null) {
-//            return;
-//        }
-//        messageListener.onFailMessage(message);
-//    }
-//
-//    @Override
-//    public void onConnect() {
-//        if (connectionStateListener == null) {
-//            return;
-//        }
-//        connectionStateListener.onConnect();
-//
-//    }
-//
-//    @Override
-//    public void onDisconnect() {
-//        if (connectionStateListener == null) {
-//            return;
-//        }
-//        connectionStateListener.onDisconnect();
-//    }
 }
